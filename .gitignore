@@ -1,0 +1,42 @@
+# Local project-management and Codex guidance (intentionally not committed)
+/AGENTS.md
+/.project-local/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Generated data, models, reports, and logs
+/data/raw/
+/data/interim/
+/artifacts/
+/models/
+/logs/
+/reports/generated/
+
+# Keep directory placeholders when added intentionally
+!.gitkeep
