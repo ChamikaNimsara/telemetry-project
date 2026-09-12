@@ -66,6 +66,31 @@ the resolved event name, session code, lap count, and available lap columns.
 
 Use `--cache-dir PATH` to override `TELEMETRY_CACHE_DIR` for one invocation.
 
+## Acquire Approved Events
+
+Acquire and validate every event in `configs/events.yaml`, then write the
+traceability manifest:
+
+```shell
+uv run python -m telemetry_project.cli acquire
+```
+
+For a small acquisition or cache check:
+
+```shell
+uv run python -m telemetry_project.cli acquire --only-event Bahrain
+uv run python -m telemetry_project.cli acquire --only-event Bahrain --offline
+```
+
+The default output is `data/manifests/event-manifest.json`. Each requested event
+receives a success or failure entry containing source identity, retrieval time,
+FastF1 version, split, row count, returned columns, and validation errors. A
+partial failure returns process status 1 after writing the complete manifest.
+
+See [data sources, provenance, and use constraints](docs/data-sources.md) before
+acquiring, sharing, or publishing data-derived outputs. Raw cache files remain
+local and must not be committed.
+
 ## Quality Checks
 
 Run the same checks enforced by continuous integration:

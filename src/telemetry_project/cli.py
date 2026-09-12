@@ -4,12 +4,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Sequence
 from dataclasses import asdict
 from pathlib import Path
 
 from telemetry_project import __version__
 from telemetry_project.config import resolve_cache_dir
+from telemetry_project.data.acquisition import (
+    AcquisitionValidationError,
+    acquire_events,
+)
+from telemetry_project.data.event_config import EventConfigError, load_event_config
+from telemetry_project.data.manifest import write_manifest
 from telemetry_project.smoke import run_fastf1_smoke
 
 
@@ -30,6 +37,33 @@ def build_parser() -> argparse.ArgumentParser:
     smoke_parser.add_argument("--event", default="Bahrain")
     smoke_parser.add_argument("--session", default="R", dest="session_code")
     smoke_parser.add_argument("--cache-dir", type=Path)
+
+    acquire_parser = commands.add_parser(
+        "acquire",
+        help="Acquire and validate configured FastF1 sessions.",
+    )
+    acquire_parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path("configs/events.yaml"),
+    )
+    acquire_parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=Path("data/manifests/event-manifest.json"),
+    )
+    acquire_parser.add_argument("--cache-dir", type=Path)
+    acquire_parser.add_argument(
+        "--only-event",
+        action="append",
+        dest="only_events",
+        help="Acquire one configured event; repeat to select multiple events.",
+    )
+    acquire_parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Require all FastF1 responses to be present in the local cache.",
+    )
     return parser
 
 
@@ -45,6 +79,30 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         print(json.dumps(asdict(result), indent=2))
         return 0
+
+    if args.command == "acquire":
+        try:
+            config = load_event_config(args.config)
+            selected = (
+                frozenset(args.only_events) if args.only_events is not None else None
+            )
+            manifest = acquire_events(
+                config,
+                cache_dir=resolve_cache_dir(args.cache_dir),
+                offline=args.offline,
+                only_events=selected,
+            )
+            write_manifest(manifest, args.manifest)
+        except (AcquisitionValidationError, EventConfigError, OSError) as error:
+            print(f"Acquisition configuration error: {error}", file=sys.stderr)
+            return 2
+
+        output = {
+            "manifest": args.manifest.as_posix(),
+            **asdict(manifest.summary),
+        }
+        print(json.dumps(output, indent=2))
+        return 0 if manifest.summary.failed == 0 else 1
 
     raise AssertionError(f"Unhandled command: {args.command}")
 
