@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "telemetry-project"
+version = "0.1.0"
+description = "Reproducible Formula 1 tyre-performance degradation analysis"
+readme = "README.md"
+requires-python = "==3.12.*"
+authors = [
+    { name = "Chamika Nimsara", email = "chamikabandaranayake@gmail.com" },
+]
+dependencies = [
+    "fastf1==3.8.3",
+]
+
+[project.scripts]
+telemetry-project = "telemetry_project.cli:entrypoint"
+
+[dependency-groups]
+dev = [
+    "mypy==2.3.1",
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+    "ruff==0.16.7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/telemetry_project"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["fastf1", "fastf1.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "--cov=telemetry_project",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-fail-under=90",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["telemetry_project"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+show_missing = true

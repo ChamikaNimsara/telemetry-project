@@ -1,6 +1,7 @@
 # Local project-management and Codex guidance (intentionally not committed)
 /AGENTS.md
 /.project-local/
+/.tools/
 
 # Python
 __pycache__/
@@ -15,6 +16,10 @@ env/
 .ruff_cache/
 .coverage
 htmlcov/
+.uv-cache/
+build/
+dist/
+*.egg-info/
 
 # Notebooks
 .ipynb_checkpoints/
