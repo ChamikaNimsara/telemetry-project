@@ -1,0 +1,56 @@
+# Approved initial event manifest for US-01/T-01.4.
+# Event eligibility remains subject to the approved Gate 2 audit and replacement policy.
+schema_version: 1
+status: approved_initial_scope
+approved_date: 2026-09-13
+season: 2024
+session: R
+objective: tyre_performance_degradation
+
+splits:
+  train:
+    - Bahrain
+    - Japan
+    - Emilia-Romagna
+    - Hungary
+    - Belgium
+    - Italy
+  validation:
+    - Spain
+    - Netherlands
+  test:
+    - Mexico City
+    - Abu Dhabi
+
+eligibility:
+  race_sessions_only: true
+  dry_running_only: true
+  slick_compounds:
+    - SOFT
+    - MEDIUM
+    - HARD
+  require_accurate_lap: true
+  exclude_deleted_laps: true
+  exclude_pit_in_laps: true
+  exclude_pit_out_laps: true
+  exclude_disrupted_track_status: true
+  require_consecutive_current_and_target_laps: true
+  minimum_eligible_laps_per_stint: null  # Set from audit before modelling.
+
+replacement_policy:
+  allowed_reasons:
+    - session_not_loadable
+    - insufficient_dry_running
+    - required_fields_unavailable
+    - unreliable_compound_stint_or_tyre_life_data
+    - insufficient_eligible_stints
+  rules:
+    - Record the failed audit and replacement rationale in DECISIONS.md.
+    - Select a replacement before any candidate model is evaluated.
+    - Preserve circuit-characteristic diversity where practical.
+    - Never replace an event because of model performance.
+
+freeze_policy:
+  - Audit all proposed events before freezing the manifest.
+  - Do not use final test events for feature selection or tuning after freeze.
+  - Record the FastF1 version and retrieval timestamp in the generated manifest.
