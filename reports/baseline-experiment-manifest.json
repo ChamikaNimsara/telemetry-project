@@ -1,0 +1,71 @@
+{
+  "manifest_schema_version": 1,
+  "experiment_version": "1.0.0",
+  "project_version": "0.1.0",
+  "python_version": "3.12.14",
+  "baseline_config_path": "configs/baseline.yaml",
+  "baseline_config_sha256": "e6d86a386686237588eb0e61367502f67b451b7488acd8aa1e05e136706d11b8",
+  "dataset_manifest_path": "data/manifests/analysis-dataset-manifest.json",
+  "dataset_manifest_sha256": "5b52645d84bcabcc5765c0467d2b8187cc5626be68d48b2872c689aa93fde7cf",
+  "dataset_sha256": "08705dff594b111da8dd120efb4a70ff7c42673053d4054f67ecef8c3b6d6834",
+  "fit": {
+    "split": "train",
+    "event_ids": [
+      "2024-01-R",
+      "2024-04-R",
+      "2024-07-R",
+      "2024-13-R",
+      "2024-14-R",
+      "2024-16-R"
+    ],
+    "rows": 5431,
+    "file_sha256": "9b1434754787017b87eedf488d94f7e3f868188f3fa0423eb8b549113e481974"
+  },
+  "evaluation": {
+    "split": "validation",
+    "event_ids": [
+      "2024-10-R",
+      "2024-15-R"
+    ],
+    "rows": 2412,
+    "file_sha256": "e1947e651c67e94115b1b65f48fc25bd48744c4b5f1dc0cc1ddc16f3244e5a7d"
+  },
+  "frozen_test_loaded": false,
+  "median_degradation_fit": {
+    "group_columns": [
+      "compound",
+      "tyre_age_band"
+    ],
+    "tyre_age_bin_edges": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      30,
+      40,
+      60
+    ],
+    "minimum_group_samples": 30,
+    "fallback_order": [
+      "compound",
+      "global"
+    ],
+    "retained_group_cells": 16,
+    "compound_medians": {
+      "HARD": 0.021,
+      "MEDIUM": 0.023,
+      "SOFT": 0.017
+    },
+    "global_median_seconds": 0.021,
+    "validation_prediction_sources": {
+      "compound_tyre_age_band": 2388,
+      "compound": 24
+    }
+  },
+  "outputs": {
+    "reports/baseline-validation-metrics.json": "bb1f83f9acd83173752774793832418a745e8af663ddfb87a274cbd7a2b01f17",
+    "reports/tables/baseline-validation-by-event.csv": "53032989acdf1885b44d7374c09f261124cb7d42444d759580f1151fdc09cd16",
+    "reports/model-report.md": "42b7885082e9f46d96b1c65dfbd4381ad28c4cd7d126bbaa27e9a297b3443887"
+  }
+}

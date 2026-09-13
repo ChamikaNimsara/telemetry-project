@@ -1,0 +1,31 @@
+# Versioned validation-only baseline policy for US-06.
+schema_version: 1
+experiment_version: "1.0.0"
+source_dataset_manifest: data/manifests/analysis-dataset-manifest.json
+fit_split: train
+evaluation_split: validation
+target_column: next_lap_time_seconds
+
+training_median_degradation:
+  group_columns:
+    - compound
+    - tyre_age_band
+  tyre_age_bin_edges:
+    - 0
+    - 5
+    - 10
+    - 15
+    - 20
+    - 30
+    - 40
+    - 60
+  minimum_group_samples: 30
+  fallback_order:
+    - compound
+    - global
+
+outputs:
+  metrics: reports/baseline-validation-metrics.json
+  per_event_metrics: reports/tables/baseline-validation-by-event.csv
+  experiment_manifest: reports/baseline-experiment-manifest.json
+  model_report: reports/model-report.md

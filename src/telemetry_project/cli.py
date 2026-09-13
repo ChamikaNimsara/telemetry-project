@@ -27,6 +27,14 @@ from telemetry_project.data.dataset_config import (
 from telemetry_project.data.dataset_pipeline import DatasetBuildError, build_dataset
 from telemetry_project.data.event_config import EventConfigError, load_event_config
 from telemetry_project.data.manifest import write_manifest
+from telemetry_project.modeling.baseline_config import (
+    BaselineConfigError,
+    load_baseline_config,
+)
+from telemetry_project.modeling.baselines import (
+    BaselineEvaluationError,
+    run_baseline_evaluation,
+)
 from telemetry_project.smoke import run_fastf1_smoke
 
 
@@ -72,6 +80,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     analysis_parser.add_argument(
         "--config", type=Path, default=Path("configs/analysis.yaml")
+    )
+    baseline_parser = commands.add_parser(
+        "evaluate-baselines",
+        help="Fit training-only baselines and evaluate validation events.",
+    )
+    baseline_parser.add_argument(
+        "--config", type=Path, default=Path("configs/baseline.yaml")
     )
     dataset_parser.add_argument("--cache-dir", type=Path)
     dataset_parser.add_argument(
@@ -163,6 +178,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Exploratory analysis error: {error}", file=sys.stderr)
             return 2
         print(json.dumps(asdict(analysis_summary), indent=2))
+        return 0
+
+    if args.command == "evaluate-baselines":
+        try:
+            baseline_config = load_baseline_config(args.config)
+            baseline_summary = run_baseline_evaluation(baseline_config)
+        except (BaselineConfigError, BaselineEvaluationError, OSError) as error:
+            print(f"Baseline evaluation error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(baseline_summary), indent=2))
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")

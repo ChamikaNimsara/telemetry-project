@@ -13,6 +13,11 @@ from telemetry_project.data.dataset_config import DatasetConfig, DatasetConfigEr
 from telemetry_project.data.dataset_pipeline import DatasetBuildSummary
 from telemetry_project.data.event_config import EventConfig, EventConfigError
 from telemetry_project.data.manifest import AcquisitionManifest, ManifestSummary
+from telemetry_project.modeling.baseline_config import (
+    BaselineConfig,
+    BaselineConfigError,
+)
+from telemetry_project.modeling.baselines import BaselineEvaluationSummary
 from telemetry_project.smoke import SmokeResult
 
 
@@ -181,3 +186,41 @@ def test_analyze_data_command_reports_configuration_error(
 
     assert main(["analyze-data"]) == 2
     assert "unsafe split" in capsys.readouterr().err
+
+
+def test_evaluate_baselines_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=BaselineConfig)
+    summary = BaselineEvaluationSummary(
+        training_rows=50,
+        validation_rows=20,
+        validation_events=2,
+        stronger_baseline="current_lap_persistence",
+        stronger_macro_event_mae_seconds=0.4,
+        frozen_test_loaded=False,
+        dataset_sha256="a" * 64,
+    )
+    evaluate = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_baseline_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.run_baseline_evaluation", evaluate)
+
+    assert main(["evaluate-baselines", "--config", "baseline.yaml"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["validation_events"] == 2
+    assert output["frozen_test_loaded"] is False
+    evaluate.assert_called_once_with(config)
+
+
+def test_evaluate_baselines_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_baseline_config",
+        Mock(side_effect=BaselineConfigError("unsafe evaluation split")),
+    )
+
+    assert main(["evaluate-baselines"]) == 2
+    assert "unsafe evaluation split" in capsys.readouterr().err

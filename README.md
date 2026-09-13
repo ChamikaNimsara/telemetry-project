@@ -131,6 +131,24 @@ rows. See the generated
 questions, measured and engineered quantities, findings, confounders, and
 modelling implications.
 
+## Evaluate the Baselines
+
+Fit the explainable training-median rule and evaluate it alongside current-lap
+persistence on the validation events:
+
+```shell
+uv run python -m telemetry_project.cli evaluate-baselines
+```
+
+The command verifies the processed input hashes, fits target-derived statistics
+using training races only, and evaluates the fixed metrics on the two validation
+races. It never loads the frozen test files. Exact aggregate and per-event
+results are recorded in
+[the baseline metrics](reports/baseline-validation-metrics.json), the
+[per-event table](reports/tables/baseline-validation-by-event.csv), and the
+[model report](reports/model-report.md). Later candidate models must use the
+same validation rows and metric definitions.
+
 ## Quality Checks
 
 Run the same checks enforced by continuous integration:
@@ -155,7 +173,7 @@ validates project behavior without depending on network data availability.
 ## Repository Layout
 
 ```text
-configs/                    Versioned event and analysis configuration
+configs/                    Versioned data, analysis, and modelling configuration
 docs/                       Public technical documentation
 reports/                    Reproducible findings and selected figures
 src/telemetry_project/      Maintained Python package

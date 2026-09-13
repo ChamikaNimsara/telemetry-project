@@ -1,0 +1,42 @@
+{
+  "metrics_schema_version": 1,
+  "experiment_version": "1.0.0",
+  "fit_split": "train",
+  "evaluation_split": "validation",
+  "target_column": "next_lap_time_seconds",
+  "primary_metric": "macro_event_mae_seconds",
+  "units": "seconds",
+  "stronger_baseline": "training_median_degradation",
+  "stronger_macro_event_mae_seconds": 0.419979,
+  "candidate_selection_gate": {
+    "minimum_macro_event_mae_reduction_percent": 5.0,
+    "maximum_candidate_macro_event_mae_seconds": 0.39898,
+    "maximum_per_event_mae_increase_percent": 10.0
+  },
+  "baselines": {
+    "current_lap_persistence": {
+      "events": 2,
+      "samples": 2412,
+      "macro_event_mae_seconds": 0.42031,
+      "macro_event_rmse_seconds": 0.745118,
+      "macro_event_median_absolute_error_seconds": 0.23125,
+      "macro_event_signed_error_seconds": -0.029622,
+      "pooled_mae_seconds": 0.41786,
+      "pooled_rmse_seconds": 0.742452,
+      "pooled_median_absolute_error_seconds": 0.2315,
+      "pooled_signed_error_seconds": -0.027351
+    },
+    "training_median_degradation": {
+      "events": 2,
+      "samples": 2412,
+      "macro_event_mae_seconds": 0.419979,
+      "macro_event_rmse_seconds": 0.744685,
+      "macro_event_median_absolute_error_seconds": 0.232375,
+      "macro_event_signed_error_seconds": -0.012007,
+      "pooled_mae_seconds": 0.417615,
+      "pooled_rmse_seconds": 0.74202,
+      "pooled_median_absolute_error_seconds": 0.23025,
+      "pooled_signed_error_seconds": -0.010124
+    }
+  }
+}
