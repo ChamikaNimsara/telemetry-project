@@ -43,3 +43,6 @@ jobs:
 
       - name: Test
         run: uv run pytest
+
+      - name: Audit release contents
+        run: uv run python -m telemetry_project.cli release-audit

@@ -1,185 +1,155 @@
 # Motorsport Telemetry Project
 
-A reproducible Formula 1 telemetry project for estimating tyre-performance
-degradation from public timing and telemetry data. Version 1 predicts the next
-eligible clean-lap time and derives the expected pace change as a tyre stint
-ages. It does not claim to measure physical tyre wear.
+[![Quality](https://github.com/ChamikaNimsara/telemetry-project/actions/workflows/quality.yml/badge.svg)](https://github.com/ChamikaNimsara/telemetry-project/actions/workflows/quality.yml)
 
-The project is currently establishing its data and modelling pipeline. See the
-[problem definition](docs/problem-definition.md) and
-[feasibility study](reports/feasibility-study.md) for the approved scope.
+A reproducible FastF1 portfolio project that estimates the next eligible clean
+lap time and uses that prediction to describe tyre-stint pace change. It is
+designed for a race-performance analyst reviewing an unseen event—not as a live
+pit-wall or safety-critical system.
 
-## Requirements
+The version 1 result is an interpretable pace-reversion model evaluated once on
+two fully held-out 2024 races. It achieved **0.3177 s macro-event MAE**, compared
+with **0.3499 s** for the stronger final baseline: a **9.22% improvement**. The
+method improved on the baseline in both held-out events and produced no
+predictions outside the project’s 30–300 s validity range.
 
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+> This project estimates observed lap-time performance, not physical tyre wear.
+> It is an unofficial educational analysis and is not affiliated with or
+> endorsed by Formula 1, its teams, or FastF1.
+
+## Why this problem matters
+
+Tyre performance is central to stint and strategy decisions, but public data
+does not expose physical tyre condition. The project therefore uses a narrower,
+testable question: given information available at the end of a clean race lap,
+how accurately can the next consecutive eligible lap time be estimated?
+
+That framing keeps the target observable and the evaluation honest. It also
+supports an engineering view of expected pace change as reported tyre age
+increases without claiming that the relationship is causal degradation.
+
+Read the complete [problem definition](docs/problem-definition.md),
+[data contract](docs/data-dictionary.md), and
+[model report](reports/model-report.md) for the precise scope.
+
+## Result at a glance
+
+| Method | Held-out macro-event MAE (s) | Interpretation |
+|---|---:|---|
+| Pace reversion (selected) | **0.3177** | Conditional median response to the previous lap-time change |
+| Current-lap persistence | 0.3499 | Predict the next lap equals the current lap |
+| Training-median degradation | 0.3504 | Add a development-only compound/tyre-age median change |
+
+The test set contains 1,839 eligible lap pairs from the Mexico City and Abu
+Dhabi Grands Prix. Selection used six training and two validation races only;
+the test events were opened after the method and gates were frozen.
+
+![Observed versus predicted held-out lap times](reports/figures/05-final-predicted-vs-observed.png)
+
+*Figure 1. Observed versus pace-reversion predictions for the two held-out
+events, in seconds. The close diagonal fit includes both small routine changes
+and less frequent larger errors.*
+
+![Final model MAE by compound](reports/figures/06-final-mae-by-compound.png)
+
+*Figure 2. Held-out MAE by compound. Hard and medium performance is stable;
+the soft estimate is based on only 25 samples and should not be generalized.*
+
+## Method and evaluation design
+
+The pipeline acquires ten 2024 race sessions, retains dry and accurate slick-tyre
+laps outside pit and disrupted-status transitions, and constructs targets only
+from immediately consecutive eligible laps within a driver stint. The resulting
+9,682 samples are grouped by whole event:
+
+- train: six races and 5,431 samples;
+- validation: two races and 2,412 samples;
+- final test: two races and 1,839 samples.
+
+The selected pace-reversion method places the observed current-versus-previous
+lap change into one of ten frozen bands. It adds the development median next-lap
+change for that band to the current lap, with a global development median when
+history is unavailable. No future-lap value is used as an input.
+
+The primary metric is unweighted macro-event mean absolute error (MAE), so a
+large race cannot dominate selection. Secondary evidence includes RMSE, median
+absolute error, signed error, per-event results, condition breakdowns, and a
+physical-range check. Candidate selection and final evaluation are recorded in
+versioned configurations and manifests.
+
+## Reproduce the project
+
+### Requirements
+
+- [uv 0.12.13](https://docs.astral.sh/uv/getting-started/installation/)
 - Git
 
-Python 3.12 is pinned in `.python-version`. `uv` can install it automatically if
-it is not already available.
+Python 3.12 is pinned in `.python-version`; uv can install it automatically.
+No API key is required for FastF1.
 
-## Setup
+### Install and verify
 
 From the repository root:
 
 ```shell
 uv python install 3.12
 uv sync --locked --dev
-uv run python -m telemetry_project.cli --help
+uv run python -m telemetry_project.cli --version
+uv run pytest
 ```
 
-`uv sync --locked` creates or updates the local `.venv` from the committed
-cross-platform `uv.lock`. The environment and lockfile must agree; update the
-lock intentionally with `uv lock` after changing dependencies.
+The committed `uv.lock` fixes the complete cross-platform environment. Keep it
+synchronized with `pyproject.toml`; update it intentionally with `uv lock` only
+when dependencies or package metadata change.
 
-No API key is required for FastF1. The optional environment variable below
-changes the local FastF1 cache directory:
+### Run the end-to-end workflow
+
+The first two commands require network access and create local FastF1 cache and
+processed files that are excluded from Git. Subsequent commands verify the
+recorded hashes before using those files.
 
 ```shell
-TELEMETRY_CACHE_DIR=data/raw/fastf1-cache
-```
-
-Copy `.env.example` only if your shell or tooling loads environment files.
-Python does not read it automatically. Raw FastF1 cache data is intentionally
-excluded from Git.
-
-## FastF1 Smoke Test
-
-Confirm that FastF1 can load lap timing for a small historical race session:
-
-```shell
-uv run python -m telemetry_project.cli smoke-fastf1 \
-  --year 2024 \
-  --event Bahrain \
-  --session R
-```
-
-PowerShell accepts the command on one line:
-
-```powershell
-uv run python -m telemetry_project.cli smoke-fastf1 --year 2024 --event Bahrain --session R
-```
-
-The first run requires network access and populates
-`data/raw/fastf1-cache/`. Telemetry and weather loading are disabled for this
-smoke test to limit download size. A successful run prints a JSON summary with
-the resolved event name, session code, lap count, and available lap columns.
-
-Use `--cache-dir PATH` to override `TELEMETRY_CACHE_DIR` for one invocation.
-
-## Acquire Approved Events
-
-Acquire and validate every event in `configs/events.yaml`, then write the
-traceability manifest:
-
-```shell
+# 1. Acquire and validate the ten configured 2024 races
 uv run python -m telemetry_project.cli acquire
+
+# 2. Clean, audit, create time-valid features, and freeze grouped splits
+uv run python -m telemetry_project.cli build-dataset
+
+# 3. Recreate development-only analysis and figures
+uv run python -m telemetry_project.cli analyze-data
+
+# 4. Recreate validation baselines and candidate comparison
+uv run python -m telemetry_project.cli evaluate-baselines
+uv run python -m telemetry_project.cli select-model
+
+# 5. Verify and recreate the frozen final evaluation
+uv run python -m telemetry_project.cli evaluate-final
+
+# 6. Audit the public release candidate
+uv run python -m telemetry_project.cli release-audit
 ```
 
-For a small acquisition or cache check:
+PowerShell users can run the same commands unchanged on one line. Use
+`build-dataset --offline` after a successful online build to prove the required
+source responses are cached. The first full acquisition may take several
+minutes depending on FastF1 availability and network speed.
+
+To check one smaller session before the full workflow:
 
 ```shell
+uv run python -m telemetry_project.cli smoke-fastf1 --year 2024 --event Bahrain --session R
 uv run python -m telemetry_project.cli acquire --only-event Bahrain
 uv run python -m telemetry_project.cli acquire --only-event Bahrain --offline
 ```
 
-The default output is `data/manifests/event-manifest.json`. Each requested event
-receives a success or failure entry containing source identity, retrieval time,
-FastF1 version, split, row count, returned columns, and validation errors. A
-partial failure returns process status 1 after writing the complete manifest.
+Set `TELEMETRY_CACHE_DIR` or pass `--cache-dir PATH` to acquisition and dataset
+commands to override the default `data/raw/fastf1-cache/` location. Copy
+`.env.example` only if your shell or tooling loads environment files; Python
+does not load it automatically.
 
-See [data sources, provenance, and use constraints](docs/data-sources.md) before
-acquiring, sharing, or publishing data-derived outputs. Raw cache files remain
-local and must not be committed.
+### Quality checks
 
-## Build the Validated Dataset
-
-Build the versioned analysis dataset, audit every exclusion, and create frozen
-event-grouped train, validation, and test outputs:
-
-```shell
-uv run python -m telemetry_project.cli build-dataset
-```
-
-The first build downloads the comparatively small weather feed required to
-confirm dry running. After that, the complete build can be verified without
-network access:
-
-```shell
-uv run python -m telemetry_project.cli build-dataset --offline
-```
-
-Processed row-level CSV files are generated under `data/processed/v1/` and are
-excluded from Git. Versioned manifests, aggregate audit tables, the
-[data dictionary](docs/data-dictionary.md), and the
-[data-quality report](reports/data-quality-report.md) provide the reproducible
-public record. Never use the frozen test split for preprocessing, feature
-selection, or tuning.
-
-## Explore the Development Data
-
-Generate the development-only motorsport analysis, aggregate evidence, and four
-publication-quality figures:
-
-```shell
-uv run python -m telemetry_project.cli analyze-data
-```
-
-The command verifies the processed file hashes and reads only training and
-validation splits. It does not load the frozen Mexico City or Abu Dhabi test
-rows. See the generated
-[exploratory analysis](reports/exploratory-analysis.md) for the engineering
-questions, measured and engineered quantities, findings, confounders, and
-modelling implications.
-
-## Evaluate the Baselines
-
-Fit the explainable training-median rule and evaluate it alongside current-lap
-persistence on the validation events:
-
-```shell
-uv run python -m telemetry_project.cli evaluate-baselines
-```
-
-The command verifies the processed input hashes, fits target-derived statistics
-using training races only, and evaluates the fixed metrics on the two validation
-races. It never loads the frozen test files. Exact aggregate and per-event
-results are recorded in
-[the baseline metrics](reports/baseline-validation-metrics.json), the
-[per-event table](reports/tables/baseline-validation-by-event.csv), and the
-[model report](reports/model-report.md). Later candidate models must use the
-same validation rows and metric definitions.
-
-## Select and Evaluate the Final Method
-
-Compare the three predeclared interpretable candidates using training and
-validation events only:
-
-```shell
-uv run python -m telemetry_project.cli select-model
-```
-
-This command freezes the lowest-MAE candidate that passes both precommitted
-validation gates in `configs/final-model.yaml`. The selected pace-reversion
-model achieved `0.368813 s` validation macro-event MAE.
-
-The final evaluation command verifies every frozen input and implementation
-hash, refits on train plus validation, and evaluates the two test races:
-
-```shell
-uv run python -m telemetry_project.cli evaluate-final
-```
-
-The frozen model achieved `0.317689 s` test macro-event MAE, improving on the
-stronger final baseline by `9.22%`, with improvement in both test events and no
-out-of-range predictions. See the [model report](reports/model-report.md),
-[final metrics](reports/final-test-metrics.json), and generated figures for the
-full comparison and limitations. The row-level prediction audit is written
-under ignored `artifacts/`; only aggregate evidence is committed. Test results
-must not be used to retune or replace the frozen method.
-
-## Quality Checks
-
-Run the same checks enforced by continuous integration:
+Run the same core checks as continuous integration:
 
 ```shell
 uv lock --check
@@ -187,42 +157,74 @@ uv run ruff format --check .
 uv run ruff check .
 uv run mypy src tests
 uv run pytest
+uv run python -m telemetry_project.cli release-audit
 ```
 
-To apply formatting locally:
+Tests use local fakes rather than the external FastF1 service. The release audit
+checks required public files, tracked-content policy, file sizes, high-confidence
+secret patterns, private absolute paths, local Markdown links, notebook output,
+and version consistency.
 
-```shell
-uv run ruff format .
-```
+## Evidence map
 
-Tests replace the external FastF1 service with local fakes. CI therefore
-validates project behavior without depending on network data availability.
+| Claim or question | Reproducible evidence |
+|---|---|
+| Why this target and user were selected | [Problem definition](docs/problem-definition.md) and [feasibility study](reports/feasibility-study.md) |
+| Which events and source fields were used | [Event configuration](configs/events.yaml), [event manifest](data/manifests/event-manifest.json), and [data sources](docs/data-sources.md) |
+| How laps were cleaned and split | [Data dictionary](docs/data-dictionary.md), [data-quality report](reports/data-quality-report.md), and [split manifest](data/manifests/split-manifest.json) |
+| What development data showed | [Exploratory analysis](reports/exploratory-analysis.md) and figures 01–04 under `reports/figures/` |
+| Why pace reversion was selected | [Candidate metrics](reports/candidate-validation-metrics.json) and [selection manifest](reports/model-selection-manifest.json) |
+| How the final result compares | [Final metrics](reports/final-test-metrics.json), [per-event table](reports/tables/final-test-by-event.csv), and [model report](reports/model-report.md) |
+| Whether the repository is release-ready | [Release checklist](docs/release-checklist.md) and [machine-readable audit](reports/release-audit.json) |
 
-## Repository Layout
+## Repository layout
 
 ```text
-configs/                    Versioned data, analysis, and modelling configuration
-docs/                       Public technical documentation
-reports/                    Reproducible findings and selected figures
-src/telemetry_project/      Maintained Python package
-tests/                      Automated tests
+configs/                    Frozen data, analysis, and modelling configuration
+data/manifests/             Source and split provenance (no row-level data)
+docs/                       Scope, schema, sources, and release documentation
+reports/                    Aggregate evidence, narrative, tables, and figures
+src/telemetry_project/      Typed, reusable pipeline and CLI implementation
+tests/                      Unit, integration, leakage, and CLI tests
 ```
 
-Generated environments, caches, raw/interim data, model binaries, and generated
-reports are excluded from version control.
+Raw source data, processed row-level data, predictions, caches, environments,
+credentials, model binaries, and generated noise are excluded from version
+control. Only compact aggregate evidence needed to audit the published claims is
+committed.
 
-## Reproducibility Rules
+## Limitations
 
-- Keep `pyproject.toml` and `uv.lock` synchronized.
-- Record the FastF1 version and event identifiers with acquired data.
-- Never commit raw FastF1 cache data, secrets, or machine-specific paths.
-- Fit preprocessing and models on training events only.
-- Keep validation and final test events disjoint from training.
-- Run the quality checks before requesting review.
+- The held-out evaluation covers only Mexico City and Abu Dhabi in the 2024
+  regulation period; two events are insufficient for a stable population
+  confidence interval.
+- The method mostly captures short-term pace reversion. It does not isolate
+  physical tyre wear from fuel load, traffic, circuit, weather, track evolution,
+  team, or driver effects.
+- Deliberately excluded safety-car, pit-transition, wet, inaccurate, and
+  non-consecutive laps are outside the evidence.
+- Soft-compound test performance is based on 25 samples and is worse than the
+  persistence baseline; it is a visible failure mode, not a supported claim.
+- Public-source fields can be corrected, incomplete, delayed, or inconsistent.
+  This project is analytical support only and is unsuitable for live or
+  safety-critical decisions.
 
-## Data Source
+See the [model report](reports/model-report.md) for detailed event and condition
+results and the [retrospective](reports/retrospective.md) for the prioritized
+next iteration.
 
-The project uses [FastF1](https://github.com/theOehrly/Fast-F1), which provides
-access to Formula 1 timing, lap, session, weather, and telemetry data. Source
-availability and field quality can vary by event, so later pipeline stages will
-produce an auditable event manifest and data-quality report.
+## Data use, license, and attribution
+
+The project uses [FastF1](https://github.com/theOehrly/Fast-F1) 3.8.3 to access
+timing, lap, session, and weather data. FastF1 is unofficial and combines
+several sources. Its software license does not grant redistribution rights to
+the underlying Formula 1 timing data.
+
+The source code and original project documentation are available under the
+[MIT License](LICENSE). That license does **not** apply to Formula 1, FastF1, or
+other third-party data, names, marks, or content. Raw and row-level derived data
+remain local. Review [the data-use controls](docs/data-sources.md) before
+acquiring, publishing, or reusing data-derived material.
+
+Contributions should follow [CONTRIBUTING.md](CONTRIBUTING.md). Citation
+metadata is provided in [CITATION.cff](CITATION.cff).

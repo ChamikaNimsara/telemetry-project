@@ -94,6 +94,12 @@ points.
 
 ## Rights and Publication Controls
 
+The repository's MIT license covers the original software and documentation
+created for this project. It does **not** license, relicense, or grant rights to
+the underlying timing data, trademarks, third-party software, or other source
+material. Row-level acquired and processed data therefore remains excluded from
+the public repository.
+
 FastF1's source code is distributed under the MIT license, but that software
 license does not grant a license to the underlying timing or race data. FastF1
 also states that it is unofficial and not associated with the Formula 1

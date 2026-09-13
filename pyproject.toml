@@ -4,18 +4,45 @@ build-backend = "hatchling.build"
 
 [project]
 name = "telemetry-project"
-version = "0.1.0"
+version = "1.0.0"
 description = "Reproducible Formula 1 tyre-performance degradation analysis"
 readme = "README.md"
 requires-python = "==3.12.*"
+license = { file = "LICENSE" }
 authors = [
     { name = "Chamika Nimsara", email = "chamikabandaranayake@gmail.com" },
+]
+keywords = ["fastf1", "motorsport", "telemetry", "tyre-degradation"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
     "fastf1==3.8.3",
     "matplotlib==3.11.2",
     "pandas==2.3.3",
     "pyyaml==6.0.3",
+]
+
+[project.urls]
+Repository = "https://github.com/ChamikaNimsara/telemetry-project"
+Documentation = "https://github.com/ChamikaNimsara/telemetry-project#readme"
+
+[tool.hatch.build]
+exclude = [
+    "/.project-local",
+    "/.tools",
+    "/AGENTS.md",
+    "/artifacts",
+    "/data/interim",
+    "/data/processed",
+    "/data/raw",
+    "/dist",
+    "/logs",
+    "/models",
 ]
 
 [project.scripts]
@@ -31,6 +58,20 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/telemetry_project"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.project-local/**",
+    "/.tools/**",
+    "/AGENTS.md",
+    "/artifacts/**",
+    "/data/interim/**",
+    "/data/processed/**",
+    "/data/raw/**",
+    "/dist/**",
+    "/logs/**",
+    "/models/**",
+]
 
 [tool.ruff]
 target-version = "py312"

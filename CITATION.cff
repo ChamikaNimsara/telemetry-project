@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If this software supports your work, please cite it using this metadata."
+title: "Motorsport Telemetry Project"
+type: software
+authors:
+  - family-names: "Bandaranayake"
+    given-names: "Chamika"
+version: 1.0.0
+date-released: 2026-09-13
+url: "https://github.com/ChamikaNimsara/telemetry-project"
+repository-code: "https://github.com/ChamikaNimsara/telemetry-project"
+license: MIT
+abstract: >-
+  A reproducible FastF1-based analysis that estimates next-clean-lap pace and
+  interprets tyre-stint performance change using event-grouped evaluation.
+keywords:
+  - motorsport
+  - telemetry
+  - FastF1
+  - tyre performance

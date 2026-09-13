@@ -27,6 +27,7 @@ from telemetry_project.modeling.selection_config import (
     ModelConfigError,
     SelectionConfig,
 )
+from telemetry_project.release_audit import AuditCheck, ReleaseAudit, ReleaseAuditError
 from telemetry_project.smoke import SmokeResult
 
 
@@ -293,3 +294,40 @@ def test_evaluate_final_command_reports_configuration_error(
 
     assert main(["evaluate-final"]) == 2
     assert "invalid freeze" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("passed", "expected_status"), [(True, 0), (False, 1)])
+def test_release_audit_command_reports_result(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    passed: bool,
+    expected_status: int,
+) -> None:
+    audit = ReleaseAudit(
+        schema_version=1,
+        generated_at_utc="2026-09-13T00:00:00Z",
+        candidate_files=10,
+        candidate_bytes=100,
+        largest_file="README.md",
+        largest_file_bytes=50,
+        passed=passed,
+        checks=(AuditCheck("files", passed, "checked"),),
+    )
+    run = Mock(return_value=audit)
+    monkeypatch.setattr("telemetry_project.cli.run_release_audit", run)
+
+    assert main(["release-audit", "--output", "audit.json"]) == expected_status
+    assert json.loads(capsys.readouterr().out)["passed"] is passed
+    run.assert_called_once_with(Path.cwd(), output=Path("audit.json"))
+
+
+def test_release_audit_command_reports_inspection_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.run_release_audit",
+        Mock(side_effect=ReleaseAuditError("not a repository")),
+    )
+
+    assert main(["release-audit"]) == 2
+    assert "not a repository" in capsys.readouterr().err

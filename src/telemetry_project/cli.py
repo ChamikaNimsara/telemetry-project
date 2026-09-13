@@ -45,6 +45,7 @@ from telemetry_project.modeling.selection_config import (
     load_final_model_config,
     load_selection_config,
 )
+from telemetry_project.release_audit import ReleaseAuditError, run_release_audit
 from telemetry_project.smoke import run_fastf1_smoke
 
 
@@ -111,6 +112,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     final_parser.add_argument(
         "--config", type=Path, default=Path("configs/final-model.yaml")
+    )
+    audit_parser = commands.add_parser(
+        "release-audit",
+        help="Check the public release candidate for packaging risks.",
+    )
+    audit_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/release-audit.json"),
     )
     dataset_parser.add_argument("--cache-dir", type=Path)
     dataset_parser.add_argument(
@@ -233,6 +243,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         print(json.dumps(asdict(final_summary), indent=2))
         return 0
+
+    if args.command == "release-audit":
+        try:
+            audit = run_release_audit(Path.cwd(), output=args.output)
+        except (OSError, ReleaseAuditError) as error:
+            print(f"Release audit error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(audit), indent=2))
+        return 0 if audit.passed else 1
 
     raise AssertionError(f"Unhandled command: {args.command}")
 

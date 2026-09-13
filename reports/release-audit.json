@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-09-13T07:37:58.226189Z",
+  "candidate_files": 95,
+  "candidate_bytes": 1348933,
+  "largest_file": "reports/figures/05-final-predicted-vs-observed.png",
+  "largest_file_bytes": 186608,
+  "passed": true,
+  "checks": [
+    {
+      "name": "required public files",
+      "passed": true,
+      "details": "all required files are present"
+    },
+    {
+      "name": "tracked-content policy",
+      "passed": true,
+      "details": "no private plans, secrets files, raw data, or generated model paths"
+    },
+    {
+      "name": "oversized files",
+      "passed": true,
+      "details": "no candidate file exceeds 5242880 bytes"
+    },
+    {
+      "name": "secret patterns",
+      "passed": true,
+      "details": "no high-confidence secret patterns found"
+    },
+    {
+      "name": "portable paths",
+      "passed": true,
+      "details": "no private absolute user paths found"
+    },
+    {
+      "name": "local Markdown links",
+      "passed": true,
+      "details": "all local Markdown links resolve"
+    },
+    {
+      "name": "notebook output",
+      "passed": true,
+      "details": "no notebooks are published"
+    },
+    {
+      "name": "version metadata",
+      "passed": true,
+      "details": "version 1.0.0 is consistent"
+    }
+  ]
+}
