@@ -6,6 +6,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from telemetry_project.analysis.config import AnalysisConfig, AnalysisConfigError
+from telemetry_project.analysis.exploratory import ExploratorySummary
 from telemetry_project.cli import main
 from telemetry_project.data.dataset_config import DatasetConfig, DatasetConfigError
 from telemetry_project.data.dataset_pipeline import DatasetBuildSummary
@@ -149,3 +151,33 @@ def test_build_dataset_command_reports_configuration_error(
 
     assert main(["build-dataset"]) == 2
     assert "bad dataset config" in capsys.readouterr().err
+
+
+def test_analyze_data_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=AnalysisConfig)
+    summary = ExploratorySummary(100, 8, 4, 0.99, 0.42, "a" * 64)
+    analyze = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_analysis_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.run_exploratory_analysis", analyze)
+
+    assert main(["analyze-data", "--config", "analysis.yaml"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["figures"] == 4
+    assert output["development_rows"] == 100
+    analyze.assert_called_once_with(config)
+
+
+def test_analyze_data_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_analysis_config",
+        Mock(side_effect=AnalysisConfigError("unsafe split")),
+    )
+
+    assert main(["analyze-data"]) == 2
+    assert "unsafe split" in capsys.readouterr().err

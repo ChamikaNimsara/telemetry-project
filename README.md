@@ -115,6 +115,22 @@ excluded from Git. Versioned manifests, aggregate audit tables, the
 public record. Never use the frozen test split for preprocessing, feature
 selection, or tuning.
 
+## Explore the Development Data
+
+Generate the development-only motorsport analysis, aggregate evidence, and four
+publication-quality figures:
+
+```shell
+uv run python -m telemetry_project.cli analyze-data
+```
+
+The command verifies the processed file hashes and reads only training and
+validation splits. It does not load the frozen Mexico City or Abu Dhabi test
+rows. See the generated
+[exploratory analysis](reports/exploratory-analysis.md) for the engineering
+questions, measured and engineered quantities, findings, confounders, and
+modelling implications.
+
 ## Quality Checks
 
 Run the same checks enforced by continuous integration:

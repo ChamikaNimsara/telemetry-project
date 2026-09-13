@@ -10,6 +10,11 @@ from dataclasses import asdict
 from pathlib import Path
 
 from telemetry_project import __version__
+from telemetry_project.analysis.config import AnalysisConfigError, load_analysis_config
+from telemetry_project.analysis.exploratory import (
+    ExploratoryAnalysisError,
+    run_exploratory_analysis,
+)
 from telemetry_project.config import resolve_cache_dir
 from telemetry_project.data.acquisition import (
     AcquisitionValidationError,
@@ -59,6 +64,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     dataset_parser.add_argument(
         "--config", type=Path, default=Path("configs/dataset.yaml")
+    )
+
+    analysis_parser = commands.add_parser(
+        "analyze-data",
+        help="Generate development-only exploratory analysis and figures.",
+    )
+    analysis_parser.add_argument(
+        "--config", type=Path, default=Path("configs/analysis.yaml")
     )
     dataset_parser.add_argument("--cache-dir", type=Path)
     dataset_parser.add_argument(
@@ -126,7 +139,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "build-dataset":
         try:
             dataset_config = load_dataset_config(args.config)
-            summary = build_dataset(
+            dataset_summary = build_dataset(
                 dataset_config,
                 cache_dir=resolve_cache_dir(args.cache_dir),
                 offline=args.offline,
@@ -139,7 +152,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         ) as error:
             print(f"Dataset build error: {error}", file=sys.stderr)
             return 2
-        print(json.dumps(asdict(summary), indent=2))
+        print(json.dumps(asdict(dataset_summary), indent=2))
+        return 0
+
+    if args.command == "analyze-data":
+        try:
+            analysis_config = load_analysis_config(args.config)
+            analysis_summary = run_exploratory_analysis(analysis_config)
+        except (AnalysisConfigError, ExploratoryAnalysisError, OSError) as error:
+            print(f"Exploratory analysis error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(analysis_summary), indent=2))
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")

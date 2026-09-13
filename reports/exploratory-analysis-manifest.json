@@ -1,0 +1,52 @@
+{
+  "manifest_schema_version": 1,
+  "analysis_version": "1.0.0",
+  "analysis_config_path": "configs/analysis.yaml",
+  "analysis_config_sha256": "7f84c80d8ec7861b25072f382dc35c24dd819630ccc44cdea12f4c05667be826",
+  "dataset_manifest_path": "data/manifests/analysis-dataset-manifest.json",
+  "dataset_manifest_sha256": "5b52645d84bcabcc5765c0467d2b8187cc5626be68d48b2872c689aa93fde7cf",
+  "dataset_sha256": "08705dff594b111da8dd120efb4a70ff7c42673053d4054f67ecef8c3b6d6834",
+  "included_splits": [
+    "train",
+    "validation"
+  ],
+  "frozen_test_loaded": false,
+  "random_seed": 20260913,
+  "development_rows": 7843,
+  "event_ids": [
+    "2024-01-R",
+    "2024-04-R",
+    "2024-07-R",
+    "2024-10-R",
+    "2024-13-R",
+    "2024-14-R",
+    "2024-15-R",
+    "2024-16-R"
+  ],
+  "figures": [
+    {
+      "path": "reports/figures/01-current-vs-next-lap.png",
+      "sha256": "2cd276be508e1d97d1a4b6b7138fdea6ff0cfbf287794a4215d142b568187c93"
+    },
+    {
+      "path": "reports/figures/02-tyre-age-pace-profile.png",
+      "sha256": "4ef1e1efee61edc6180cd018f90d84be8e03d712ee06bf3da9e1f867c877bc77"
+    },
+    {
+      "path": "reports/figures/03-event-compound-coverage.png",
+      "sha256": "9f114a1a6287415c222488b47c7c460872f77491d23ebaf9de7d377118211865"
+    },
+    {
+      "path": "reports/figures/04-nullable-feature-missingness.png",
+      "sha256": "8dde2bf19800c8e1ac879cce045afac1fcd8c695b851fe77772bad55b071744e"
+    }
+  ],
+  "event_summary": {
+    "path": "reports/tables/exploratory-event-summary.csv",
+    "sha256": "3c7645d68776ec0586bcd02eaf6ad9fa0f198a0a33d00186a5951ba1a8cfea8f"
+  },
+  "report": {
+    "path": "reports/exploratory-analysis.md",
+    "sha256": "7dff64d620ad304c8f038a1bf7038d7a65eb32bfe919a56f496fad8b30ec2891"
+  }
+}

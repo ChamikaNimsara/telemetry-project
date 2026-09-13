@@ -1,0 +1,23 @@
+# Reproducible exploratory analysis policy for US-05.
+schema_version: 1
+analysis_version: "1.0.0"
+source_dataset_manifest: data/manifests/analysis-dataset-manifest.json
+include_splits:
+  - train
+  - validation
+random_seed: 20260913
+scatter_rows_per_event: 250
+tyre_age_bin_edges:
+  - 0
+  - 5
+  - 10
+  - 15
+  - 20
+  - 30
+  - 40
+  - 60
+outputs:
+  report: reports/exploratory-analysis.md
+  figure_directory: reports/figures
+  event_summary: reports/tables/exploratory-event-summary.csv
+  analysis_manifest: reports/exploratory-analysis-manifest.json

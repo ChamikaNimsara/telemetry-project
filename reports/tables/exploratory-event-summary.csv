@@ -1,0 +1,9 @@
+split,event_id,event_name,samples,median_next_lap_seconds,median_next_lap_delta_seconds,persistence_mae_seconds,median_track_temp_c,maximum_tyre_life_laps,previous_lap_missing_percent
+train,2024-01-R,Bahrain Grand Prix,929,96.821,0.051,0.313,22.7,29.0,7.3197
+train,2024-04-R,Japanese Grand Prix,694,97.5,0.0495,0.7672,35.5,29.0,9.366
+train,2024-07-R,Emilia Romagna Grand Prix,1117,81.982,0.026,0.4162,41.9,53.0,4.0286
+train,2024-13-R,Hungarian Grand Prix,1155,84.393,0.027,0.408,45.1,40.0,6.5801
+train,2024-14-R,Belgian Grand Prix,659,108.97,-0.016,0.326,43.0,33.0,9.1047
+train,2024-16-R,Italian Grand Prix,877,84.852,-0.027,0.3956,45.8,42.0,5.5872
+validation,2024-10-R,Spanish Grand Prix,1104,80.652,0.067,0.4493,41.4,36.0,5.6159
+validation,2024-15-R,Dutch Grand Prix,1308,76.3175,-0.0025,0.3913,31.8,56.0,3.5168
