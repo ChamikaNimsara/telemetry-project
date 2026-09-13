@@ -1,0 +1,27 @@
+# Versioned cleaning, eligibility, target, and output policy for US-04.
+schema_version: 1
+dataset_version: "1.0.0"
+source_event_config: configs/events.yaml
+source_acquisition_manifest: data/manifests/event-manifest.json
+
+eligibility:
+  slick_compounds:
+    - SOFT
+    - MEDIUM
+    - HARD
+  allowed_track_status:
+    - "1"
+  require_accurate_lap: true
+  exclude_deleted_laps: true
+  exclude_pit_in_laps: true
+  exclude_pit_out_laps: true
+  require_dry_weather: true
+  require_weather_coverage: true
+  minimum_consecutive_eligible_laps: 3
+
+outputs:
+  processed_directory: data/processed/v1
+  dataset_manifest: data/manifests/analysis-dataset-manifest.json
+  split_manifest: data/manifests/split-manifest.json
+  audit_table: reports/tables/data-quality-by-event.csv
+  quality_report: reports/data-quality-report.md

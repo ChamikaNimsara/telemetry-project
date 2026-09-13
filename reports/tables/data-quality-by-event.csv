@@ -1,0 +1,11 @@
+event_id,event_name,split,raw_laps,duplicate_lap_keys,non_monotonic_time_rows,missing_required_rows,weather_missing_rows,wet_weather_rows,disrupted_track_status_rows,pit_laps,inaccurate_laps,deleted_laps,base_eligible_laps,target_pairs_before_minimum,final_samples,excluded_short_segment_pairs,excluded_duplicate_lap_key,excluded_missing_identity,excluded_missing_lap_time,excluded_implausible_lap_time,excluded_missing_tyre_data,excluded_non_slick_compound,excluded_inaccurate_lap,excluded_deleted_lap,excluded_pit_in_lap,excluded_pit_out_lap,excluded_missing_feature,excluded_missing_weather,excluded_wet_weather,excluded_disrupted_track_status
+2024-01-R,Bahrain Grand Prix,train,1129,0,0,2,0,0,42,86,105,0,1006,931,929,2,0,0,2,0,0,0,103,0,0,0,0,0,0,18
+2024-04-R,Japanese Grand Prix,train,907,0,0,31,0,0,42,108,122,0,764,696,694,2,0,2,29,0,0,0,91,0,0,0,0,0,0,21
+2024-07-R,Emilia Romagna Grand Prix,train,1238,0,0,1,0,0,0,55,74,0,1164,1118,1117,1,0,0,1,0,0,0,73,0,0,0,0,0,0,0
+2024-13-R,Hungarian Grand Prix,train,1355,0,0,0,0,0,21,82,101,0,1233,1155,1155,0,0,0,0,0,0,0,101,0,0,0,0,0,0,21
+2024-14-R,Belgian Grand Prix,train,841,0,0,1,0,0,19,69,90,0,734,663,659,4,0,0,1,0,0,0,89,0,0,0,0,0,0,17
+2024-16-R,Italian Grand Prix,train,1008,0,0,0,0,0,0,61,81,0,927,877,877,0,0,0,0,0,0,0,81,0,0,0,0,0,0,0
+2024-10-R,Spanish Grand Prix,validation,1310,0,0,0,0,20,0,85,104,0,1186,1104,1104,0,0,0,0,0,0,0,104,0,0,0,0,0,20,0
+2024-15-R,Dutch Grand Prix,validation,1426,0,0,0,0,0,0,53,72,0,1354,1308,1308,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0
+2024-20-R,Mexico City Grand Prix,test,1215,0,0,2,0,0,110,44,154,0,1061,1021,1021,0,0,2,0,0,0,0,152,0,0,0,0,0,0,0
+2024-24-R,Abu Dhabi Grand Prix,test,1035,0,0,2,0,0,102,56,114,0,883,821,818,3,0,2,0,0,0,0,112,0,0,0,0,0,0,38

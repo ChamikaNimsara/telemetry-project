@@ -806,6 +806,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastf1" },
+    { name = "pandas" },
     { name = "pyyaml" },
 ]
 
@@ -820,6 +821,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastf1", specifier = "==3.8.3" },
+    { name = "pandas", specifier = "==2.3.3" },
     { name = "pyyaml", specifier = "==6.0.3" },
 ]
 

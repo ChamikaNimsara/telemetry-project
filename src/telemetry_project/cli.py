@@ -15,6 +15,11 @@ from telemetry_project.data.acquisition import (
     AcquisitionValidationError,
     acquire_events,
 )
+from telemetry_project.data.dataset_config import (
+    DatasetConfigError,
+    load_dataset_config,
+)
+from telemetry_project.data.dataset_pipeline import DatasetBuildError, build_dataset
 from telemetry_project.data.event_config import EventConfigError, load_event_config
 from telemetry_project.data.manifest import write_manifest
 from telemetry_project.smoke import run_fastf1_smoke
@@ -46,6 +51,20 @@ def build_parser() -> argparse.ArgumentParser:
         "--config",
         type=Path,
         default=Path("configs/events.yaml"),
+    )
+
+    dataset_parser = commands.add_parser(
+        "build-dataset",
+        help="Build and audit the leakage-safe analysis dataset.",
+    )
+    dataset_parser.add_argument(
+        "--config", type=Path, default=Path("configs/dataset.yaml")
+    )
+    dataset_parser.add_argument("--cache-dir", type=Path)
+    dataset_parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Require lap and weather responses to exist in the FastF1 cache.",
     )
     acquire_parser.add_argument(
         "--manifest",
@@ -82,12 +101,12 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "acquire":
         try:
-            config = load_event_config(args.config)
+            event_config = load_event_config(args.config)
             selected = (
                 frozenset(args.only_events) if args.only_events is not None else None
             )
             manifest = acquire_events(
-                config,
+                event_config,
                 cache_dir=resolve_cache_dir(args.cache_dir),
                 offline=args.offline,
                 only_events=selected,
@@ -103,6 +122,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         }
         print(json.dumps(output, indent=2))
         return 0 if manifest.summary.failed == 0 else 1
+
+    if args.command == "build-dataset":
+        try:
+            dataset_config = load_dataset_config(args.config)
+            summary = build_dataset(
+                dataset_config,
+                cache_dir=resolve_cache_dir(args.cache_dir),
+                offline=args.offline,
+            )
+        except (
+            DatasetBuildError,
+            DatasetConfigError,
+            EventConfigError,
+            OSError,
+        ) as error:
+            print(f"Dataset build error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(summary), indent=2))
+        return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")
 

@@ -91,6 +91,30 @@ See [data sources, provenance, and use constraints](docs/data-sources.md) before
 acquiring, sharing, or publishing data-derived outputs. Raw cache files remain
 local and must not be committed.
 
+## Build the Validated Dataset
+
+Build the versioned analysis dataset, audit every exclusion, and create frozen
+event-grouped train, validation, and test outputs:
+
+```shell
+uv run python -m telemetry_project.cli build-dataset
+```
+
+The first build downloads the comparatively small weather feed required to
+confirm dry running. After that, the complete build can be verified without
+network access:
+
+```shell
+uv run python -m telemetry_project.cli build-dataset --offline
+```
+
+Processed row-level CSV files are generated under `data/processed/v1/` and are
+excluded from Git. Versioned manifests, aggregate audit tables, the
+[data dictionary](docs/data-dictionary.md), and the
+[data-quality report](reports/data-quality-report.md) provide the reproducible
+public record. Never use the frozen test split for preprocessing, feature
+selection, or tuning.
+
 ## Quality Checks
 
 Run the same checks enforced by continuous integration:

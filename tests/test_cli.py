@@ -7,6 +7,8 @@ from unittest.mock import Mock
 import pytest
 
 from telemetry_project.cli import main
+from telemetry_project.data.dataset_config import DatasetConfig, DatasetConfigError
+from telemetry_project.data.dataset_pipeline import DatasetBuildSummary
 from telemetry_project.data.event_config import EventConfig, EventConfigError
 from telemetry_project.data.manifest import AcquisitionManifest, ManifestSummary
 from telemetry_project.smoke import SmokeResult
@@ -117,3 +119,33 @@ def test_acquire_command_reports_configuration_error(
 
     assert main(["acquire"]) == 2
     assert "bad event config" in capsys.readouterr().err
+
+
+def test_build_dataset_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=DatasetConfig)
+    summary = DatasetBuildSummary(3, 15, 12, 4, 4, 4, "a" * 64)
+    build = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_dataset_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.build_dataset", build)
+
+    assert main(["build-dataset", "--offline", "--cache-dir", "cache"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["samples"] == 12
+    assert output["dataset_sha256"] == "a" * 64
+    assert build.call_args.kwargs["offline"] is True
+
+
+def test_build_dataset_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    error = DatasetConfigError("bad dataset config")
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_dataset_config", Mock(side_effect=error)
+    )
+
+    assert main(["build-dataset"]) == 2
+    assert "bad dataset config" in capsys.readouterr().err

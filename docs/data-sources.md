@@ -24,9 +24,10 @@ laps=True, telemetry=False, weather=False, messages=False
 ```
 
 This loads the timing and metadata required to validate the approved event
-scope without downloading the much larger car-telemetry feed. Weather,
-race-control messages, and telemetry will be enabled deliberately in later data
-work only when their fields and quality checks are specified.
+scope without downloading the much larger car-telemetry feed. The US-04
+`build-dataset` command additionally loads and caches weather so dry-running
+eligibility can be verified. Race-control messages and telemetry remain
+disabled until their fields and quality checks are explicitly justified.
 
 The raw FastF1 request cache is stored under `data/raw/fastf1-cache/` by default.
 It is excluded from Git and must not be redistributed through this repository.

@@ -38,6 +38,7 @@ Thumbs.db
 # Generated data, models, reports, and logs
 /data/raw/
 /data/interim/
+/data/processed/
 /artifacts/
 /models/
 /logs/
