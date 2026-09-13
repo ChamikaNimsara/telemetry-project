@@ -1,61 +1,79 @@
 # Model Report
 
-## US-06 — Validation Baselines
+## US-06 — Baseline benchmark
 
-### Evaluation boundary
+Current-lap persistence predicts that the next clean lap will equal the lap just
+completed. Training-median degradation adds the training median next-lap change
+for the current compound and reported tyre-age band, falling back to compound
+and then global training medians for sparse cells. Both operate at the same
+prediction point and use the same eligible rows and metrics as candidates.
 
-Both rules predict `next_lap_time_seconds` at the end of the current eligible
-lap. Their metrics use the same 2,412 validation rows and complete
-held-out events (2024-10-R, 2024-15-R) that later candidates must use during
-selection. Only the 5,431 training rows are used to estimate the
-second rule. The frozen test files are not loaded by this command.
+Persistence is vulnerable to an unrepresentative current lap. The median rule
+is coarse and cannot adjust for circuit, driver, fuel, traffic, track evolution,
+or interacting conditions. On validation, training-median degradation was the
+stronger fixed baseline at 0.419979 s macro-event MAE; neither rule represents a
+causal estimate of physical tyre wear.
 
-The primary metric is unweighted macro-event mean absolute error (MAE), so each
-race contributes equally even when sample counts differ. Secondary diagnostics
-are event-macro RMSE, median absolute error, and signed error, plus pooled
-versions for auditability. All errors are in seconds.
+## Final method and evaluation
 
-### Rules and results
+The selected method is **pace reversion**: it places the latest observed
+current-minus-previous lap change into one of ten predeclared bands and adds the
+training median next-lap change for that band to the current lap. It is a robust,
+interpretable conditional-median model. Missing history falls back to the global
+development median. No future-lap value is an input.
 
-| Baseline | Explanation | Macro-event MAE (s) | Macro-event RMSE (s) | Macro-event signed error (s) |
-|---|---|---:|---:|---:|
-| Current-lap persistence | Predict that the next clean lap equals the just-completed lap. | 0.4203 | 0.7451 | -0.0296 |
-| Training-median degradation | Add the training median next-lap change for the current compound and reported tyre-age band. | 0.4200 | 0.7447 | -0.0120 |
+Selection used six training events and two validation events only. Pace
+reversion achieved 0.368813 s validation
+macro-event MAE, passed the frozen 0.398980 s gate, and was frozen in
+`configs/final-model.yaml` before test rows were loaded. The compound/tyre-age
+variant was evaluated but not selected because the extra segmentation did not
+improve validation MAE.
 
-The stronger fixed benchmark on validation is **training median degradation**.
-Under D-008, a candidate must reduce validation macro-event MAE by at least 5%
-relative to this rule: the maximum qualifying MAE is
-**0.398980 s**. It also may not worsen either validation event
-by more than 10% before it can be selected.
+For the one-time final evaluation, the selected method and training-median
+baseline were refitted on train plus validation, then compared on the two frozen
+test races. The selected method achieved 0.3177
+s macro-event MAE versus 0.3499 s for the
+stronger final baseline (9.22% change).
 
-### What the training-median rule knows
+### Held-out event variation
 
-The rule knows the current lap time, reported compound, and reported tyre life,
-all available at prediction time. It learns only the median observed
-`next_lap_delta_seconds` from training events. A compound/age cell is used only
-when it has at least 30 training
-samples. Otherwise the rule falls back first to the compound median and then to
-the global training median. Validation fallback counts were:
-compound=24, compound_tyre_age_band=2,388.
+| Event | Samples | MAE (s) | RMSE (s) | Signed error (s) |
+|---|---:|---:|---:|---:|
+| Mexico City Grand Prix | 1,021 | 0.3574 | 0.6064 | -0.0389 |
+| Abu Dhabi Grand Prix | 818 | 0.2780 | 0.4362 | -0.0289 |
 
-This rule is deliberately not a fitted physical tyre-wear model. Its age bands
-are coarse, and its medians do not adjust for driver, circuit, fuel mass,
-traffic, track evolution, temperature, setup, or interactions among them. It
-can underperform when a validation event has conditions unlike training, when
-reported tyre life is outside well-covered cells, or when the current lap is an
-unrepresentative anchor. These are predictive associations, not causal tyre
-effects.
+### Error by compound
 
-### Reproduction and evidence
+| Compound | Samples | MAE (s) |
+|---|---:|---:|
+| HARD | 1,192 | 0.3154 |
+| MEDIUM | 622 | 0.3156 |
+| SOFT | 25 | 0.7993 |
 
-Run:
+### Error analysis, robustness, and limitations
+
+The per-event range is the most defensible uncertainty signal with only two
+held-out races; it is not enough to estimate a stable population confidence
+interval. Condition-level results in
+`reports/tables/final-test-by-condition.csv` cover compound, tyre-age band, and
+missing previous-lap context. The selected method produced 0
+predictions outside the dataset's 30-300 s physical range.
+
+The model mainly captures short-term pace reversion, not physical tyre wear.
+Tyre age, compound, fuel load, traffic, circuit, and track evolution remain
+associated and cannot be interpreted causally. Large disruptions are excluded
+by the dataset policy, so accuracy does not establish performance during safety
+cars, pit transitions, wet running, other seasons, or live operations. A poor
+current or previous lap can still anchor a poor prediction.
+
+### Reproduction
 
 ```shell
-uv run python -m telemetry_project.cli evaluate-baselines
+uv run python -m telemetry_project.cli select-model
+uv run python -m telemetry_project.cli evaluate-final
 ```
 
-The command verifies input hashes, fits on `train`, evaluates only on
-`validation`, and rewrites the aggregate metrics, per-event table, this report,
-and experiment manifest deterministically. See
-`reports/baseline-validation-metrics.json` and
-`reports/tables/baseline-validation-by-event.csv` for exact values.
+The first command is development-only. The second verifies the frozen selection
+hashes, writes row-level predictions to an ignored local artifact, and publishes
+only aggregate metrics and figures. Do not rerun final evaluation to tune or
+replace the selected method.

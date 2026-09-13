@@ -1,0 +1,7 @@
+baseline,event_id,event_name,samples,mae_seconds,rmse_seconds,median_absolute_error_seconds,signed_error_seconds
+pace_reversion,2024-10-R,Spanish Grand Prix,1104,0.395581,0.706743,0.235,-0.096394
+pace_reversion,2024-15-R,Dutch Grand Prix,1308,0.342045,0.582729,0.20225,-0.026982
+pace_reversion_compound_tyre_age,2024-10-R,Spanish Grand Prix,1104,0.395307,0.705863,0.23725,-0.095761
+pace_reversion_compound_tyre_age,2024-15-R,Dutch Grand Prix,1308,0.34413,0.583735,0.202,-0.032595
+two_lap_mean,2024-10-R,Spanish Grand Prix,1104,0.431135,0.720157,0.26875,-0.075602
+two_lap_mean,2024-15-R,Dutch Grand Prix,1308,0.374638,0.614682,0.2155,-0.003998

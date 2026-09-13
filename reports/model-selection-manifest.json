@@ -1,0 +1,31 @@
+{
+  "manifest_schema_version": 1,
+  "experiment_version": "1.0.0",
+  "project_version": "0.1.0",
+  "python_version": "3.12.14",
+  "random_seed": 20260913,
+  "selection_config_path": "configs/model-selection.yaml",
+  "selection_config_sha256": "4bf95bf547d740a3e8346c6e37ed115970bf622b16ffe51618b3f4b4a43da007",
+  "model_implementation_sha256": "78292a1615d153dc4a46aaa2304603e30c9c8b6cdfa9670b4bb452d8dbb6a132",
+  "dataset_manifest_sha256": "5b52645d84bcabcc5765c0467d2b8187cc5626be68d48b2872c689aa93fde7cf",
+  "dataset_sha256": "08705dff594b111da8dd120efb4a70ff7c42673053d4054f67ecef8c3b6d6834",
+  "training_event_ids": [
+    "2024-01-R",
+    "2024-04-R",
+    "2024-07-R",
+    "2024-13-R",
+    "2024-14-R",
+    "2024-16-R"
+  ],
+  "validation_event_ids": [
+    "2024-10-R",
+    "2024-15-R"
+  ],
+  "selected_method": "pace_reversion",
+  "frozen_test_loaded": false,
+  "outputs": {
+    "reports/candidate-validation-metrics.json": "821cbd83ebc8f308a0a95dd0c737641f07f4fe2770a209deac3322735872d0ca",
+    "reports/tables/candidate-validation-by-event.csv": "d0147a196ef4e1e38a71a65fe8d4c7f4f29045b34e9ad9e5576894f9f62fb56f",
+    "configs/final-model.yaml": "1cfb1b707f7a9c0782f7c0346eb1635784ba1244d79ddff924696cc3ea0ce47e"
+  }
+}

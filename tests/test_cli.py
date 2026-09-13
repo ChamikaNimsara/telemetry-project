@@ -18,6 +18,15 @@ from telemetry_project.modeling.baseline_config import (
     BaselineConfigError,
 )
 from telemetry_project.modeling.baselines import BaselineEvaluationSummary
+from telemetry_project.modeling.experiments import (
+    FinalEvaluationSummary,
+    SelectionSummary,
+)
+from telemetry_project.modeling.selection_config import (
+    FinalModelConfig,
+    ModelConfigError,
+    SelectionConfig,
+)
 from telemetry_project.smoke import SmokeResult
 
 
@@ -224,3 +233,63 @@ def test_evaluate_baselines_command_reports_configuration_error(
 
     assert main(["evaluate-baselines"]) == 2
     assert "unsafe evaluation split" in capsys.readouterr().err
+
+
+def test_select_model_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=SelectionConfig)
+    summary = SelectionSummary(50, 20, 3, 2, "pace_reversion", 0.36, False)
+    select = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_selection_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.select_model", select)
+
+    assert main(["select-model", "--config", "selection.yaml"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["selected_method"] == "pace_reversion"
+    assert output["frozen_test_loaded"] is False
+    select.assert_called_once_with(config)
+
+
+def test_select_model_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_selection_config",
+        Mock(side_effect=ModelConfigError("unsafe selection")),
+    )
+
+    assert main(["select-model"]) == 2
+    assert "unsafe selection" in capsys.readouterr().err
+
+
+def test_evaluate_final_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=FinalModelConfig)
+    summary = FinalEvaluationSummary(80, 20, 2, "pace_reversion", 0.35, 0.42, 16.7)
+    evaluate = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_final_model_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.evaluate_final", evaluate)
+
+    assert main(["evaluate-final", "--config", "final.yaml"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["test_events"] == 2
+    assert output["selected_method"] == "pace_reversion"
+    evaluate.assert_called_once_with(config)
+
+
+def test_evaluate_final_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_final_model_config",
+        Mock(side_effect=ModelConfigError("invalid freeze")),
+    )
+
+    assert main(["evaluate-final"]) == 2
+    assert "invalid freeze" in capsys.readouterr().err

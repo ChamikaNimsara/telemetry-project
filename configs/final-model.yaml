@@ -1,0 +1,38 @@
+schema_version: 1
+experiment_version: 1.0.0
+selected_method: pace_reversion
+previous_delta_bin_edges:
+- -120.0
+- -2.0
+- -1.0
+- -0.5
+- -0.2
+- 0.0
+- 0.2
+- 0.5
+- 1.0
+- 2.0
+- 120.0
+minimum_group_samples: 30
+fit_splits:
+- train
+- validation
+evaluation_split: test
+random_seed: 20260913
+source_dataset_manifest: data/manifests/analysis-dataset-manifest.json
+source_selection_config: configs/model-selection.yaml
+source_selection_config_sha256: 4bf95bf547d740a3e8346c6e37ed115970bf622b16ffe51618b3f4b4a43da007
+candidate_metrics: reports/candidate-validation-metrics.json
+candidate_metrics_sha256: 821cbd83ebc8f308a0a95dd0c737641f07f4fe2770a209deac3322735872d0ca
+baseline_config: configs/baseline.yaml
+baseline_config_sha256: e6d86a386686237588eb0e61367502f67b451b7488acd8aa1e05e136706d11b8
+model_implementation: src/telemetry_project/modeling/experiments.py
+model_implementation_sha256: 78292a1615d153dc4a46aaa2304603e30c9c8b6cdfa9670b4bb452d8dbb6a132
+outputs:
+  predictions: artifacts/predictions/final-test-predictions.csv
+  metrics: reports/final-test-metrics.json
+  per_event_metrics: reports/tables/final-test-by-event.csv
+  condition_metrics: reports/tables/final-test-by-condition.csv
+  experiment_manifest: reports/final-experiment-manifest.json
+  model_report: reports/model-report.md
+  figure_directory: reports/figures

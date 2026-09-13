@@ -149,6 +149,34 @@ results are recorded in
 [model report](reports/model-report.md). Later candidate models must use the
 same validation rows and metric definitions.
 
+## Select and Evaluate the Final Method
+
+Compare the three predeclared interpretable candidates using training and
+validation events only:
+
+```shell
+uv run python -m telemetry_project.cli select-model
+```
+
+This command freezes the lowest-MAE candidate that passes both precommitted
+validation gates in `configs/final-model.yaml`. The selected pace-reversion
+model achieved `0.368813 s` validation macro-event MAE.
+
+The final evaluation command verifies every frozen input and implementation
+hash, refits on train plus validation, and evaluates the two test races:
+
+```shell
+uv run python -m telemetry_project.cli evaluate-final
+```
+
+The frozen model achieved `0.317689 s` test macro-event MAE, improving on the
+stronger final baseline by `9.22%`, with improvement in both test events and no
+out-of-range predictions. See the [model report](reports/model-report.md),
+[final metrics](reports/final-test-metrics.json), and generated figures for the
+full comparison and limitations. The row-level prediction audit is written
+under ignored `artifacts/`; only aggregate evidence is committed. Test results
+must not be used to retune or replace the frozen method.
+
 ## Quality Checks
 
 Run the same checks enforced by continuous integration:

@@ -1,0 +1,7 @@
+baseline,event_id,event_name,samples,mae_seconds,rmse_seconds,median_absolute_error_seconds,signed_error_seconds
+current_lap_persistence,2024-20-R,Mexico City Grand Prix,1021,0.397385,0.680973,0.213,-0.015865
+current_lap_persistence,2024-24-R,Abu Dhabi Grand Prix,818,0.302488,0.480225,0.185,-0.022075
+pace_reversion,2024-20-R,Mexico City Grand Prix,1021,0.357426,0.606446,0.201,-0.038919
+pace_reversion,2024-24-R,Abu Dhabi Grand Prix,818,0.277951,0.43618,0.18175,-0.028938
+training_median_degradation,2024-20-R,Mexico City Grand Prix,1021,0.397653,0.681276,0.212,-0.00137
+training_median_degradation,2024-24-R,Abu Dhabi Grand Prix,818,0.303087,0.479643,0.1865,-0.001462

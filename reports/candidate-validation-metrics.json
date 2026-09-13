@@ -1,0 +1,91 @@
+{
+  "metrics_schema_version": 1,
+  "experiment_version": "1.0.0",
+  "fit_split": "train",
+  "evaluation_split": "validation",
+  "target_column": "next_lap_time_seconds",
+  "primary_metric": "macro_event_mae_seconds",
+  "baseline_reference": {
+    "name": "training_median_degradation",
+    "macro_event_mae_seconds": 0.419979,
+    "candidate_gate": {
+      "minimum_macro_event_mae_reduction_percent": 5.0,
+      "maximum_candidate_macro_event_mae_seconds": 0.39898,
+      "maximum_per_event_mae_increase_percent": 10.0
+    }
+  },
+  "candidates": {
+    "pace_reversion": {
+      "events": 2,
+      "samples": 2412,
+      "macro_event_mae_seconds": 0.368813,
+      "macro_event_rmse_seconds": 0.644736,
+      "macro_event_median_absolute_error_seconds": 0.218625,
+      "macro_event_signed_error_seconds": -0.061688,
+      "pooled_mae_seconds": 0.366549,
+      "pooled_rmse_seconds": 0.64247,
+      "pooled_median_absolute_error_seconds": 0.21425,
+      "pooled_signed_error_seconds": -0.058752
+    },
+    "pace_reversion_compound_tyre_age": {
+      "events": 2,
+      "samples": 2412,
+      "macro_event_mae_seconds": 0.369718,
+      "macro_event_rmse_seconds": 0.644799,
+      "macro_event_median_absolute_error_seconds": 0.219625,
+      "macro_event_signed_error_seconds": -0.064178,
+      "pooled_mae_seconds": 0.367554,
+      "pooled_rmse_seconds": 0.642522,
+      "pooled_median_absolute_error_seconds": 0.215,
+      "pooled_signed_error_seconds": -0.061507
+    },
+    "two_lap_mean": {
+      "events": 2,
+      "samples": 2412,
+      "macro_event_mae_seconds": 0.402886,
+      "macro_event_rmse_seconds": 0.66742,
+      "macro_event_median_absolute_error_seconds": 0.242125,
+      "macro_event_signed_error_seconds": -0.0398,
+      "pooled_mae_seconds": 0.400497,
+      "pooled_rmse_seconds": 0.665039,
+      "pooled_median_absolute_error_seconds": 0.241,
+      "pooled_signed_error_seconds": -0.036772
+    }
+  },
+  "qualification": {
+    "two_lap_mean": {
+      "qualifies": false,
+      "macro_event_mae_gate_pass": false,
+      "per_event_regression_gate_pass": true,
+      "maximum_event_mae_ratio": 0.962512,
+      "prediction_sources": {
+        "current_only": 108,
+        "two_lap_mean": 2304
+      }
+    },
+    "pace_reversion": {
+      "qualifies": true,
+      "macro_event_mae_gate_pass": true,
+      "per_event_regression_gate_pass": true,
+      "maximum_event_mae_ratio": 0.883137,
+      "prediction_sources": {
+        "global_missing_history": 108,
+        "group": 2304
+      }
+    },
+    "pace_reversion_compound_tyre_age": {
+      "qualifies": true,
+      "macro_event_mae_gate_pass": true,
+      "per_event_regression_gate_pass": true,
+      "maximum_event_mae_ratio": 0.882526,
+      "prediction_sources": {
+        "global_missing_history": 108,
+        "previous_delta_band": 913,
+        "group": 1391
+      }
+    }
+  },
+  "selected_method": "pace_reversion",
+  "selection_rule": "lowest qualifying validation macro-event MAE",
+  "frozen_test_loaded": false
+}

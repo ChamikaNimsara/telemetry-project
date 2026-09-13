@@ -35,6 +35,16 @@ from telemetry_project.modeling.baselines import (
     BaselineEvaluationError,
     run_baseline_evaluation,
 )
+from telemetry_project.modeling.experiments import (
+    ModelExperimentError,
+    evaluate_final,
+    select_model,
+)
+from telemetry_project.modeling.selection_config import (
+    ModelConfigError,
+    load_final_model_config,
+    load_selection_config,
+)
 from telemetry_project.smoke import run_fastf1_smoke
 
 
@@ -87,6 +97,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     baseline_parser.add_argument(
         "--config", type=Path, default=Path("configs/baseline.yaml")
+    )
+    selection_parser = commands.add_parser(
+        "select-model",
+        help="Compare frozen candidates using training and validation only.",
+    )
+    selection_parser.add_argument(
+        "--config", type=Path, default=Path("configs/model-selection.yaml")
+    )
+    final_parser = commands.add_parser(
+        "evaluate-final",
+        help="Evaluate the frozen selected method on held-out test events.",
+    )
+    final_parser.add_argument(
+        "--config", type=Path, default=Path("configs/final-model.yaml")
     )
     dataset_parser.add_argument("--cache-dir", type=Path)
     dataset_parser.add_argument(
@@ -188,6 +212,26 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Baseline evaluation error: {error}", file=sys.stderr)
             return 2
         print(json.dumps(asdict(baseline_summary), indent=2))
+        return 0
+
+    if args.command == "select-model":
+        try:
+            selection_config = load_selection_config(args.config)
+            selection_summary = select_model(selection_config)
+        except (ModelConfigError, ModelExperimentError, OSError) as error:
+            print(f"Model selection error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(selection_summary), indent=2))
+        return 0
+
+    if args.command == "evaluate-final":
+        try:
+            final_config = load_final_model_config(args.config)
+            final_summary = evaluate_final(final_config)
+        except (ModelConfigError, ModelExperimentError, OSError) as error:
+            print(f"Final evaluation error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(final_summary), indent=2))
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")

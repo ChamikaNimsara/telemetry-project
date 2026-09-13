@@ -1,0 +1,47 @@
+{
+  "manifest_schema_version": 1,
+  "experiment_version": "1.0.0",
+  "project_version": "0.1.0",
+  "python_version": "3.12.14",
+  "random_seed": 20260913,
+  "final_model_config_path": "configs/final-model.yaml",
+  "final_model_config_sha256": "1cfb1b707f7a9c0782f7c0346eb1635784ba1244d79ddff924696cc3ea0ce47e",
+  "dataset_manifest_sha256": "5b52645d84bcabcc5765c0467d2b8187cc5626be68d48b2872c689aa93fde7cf",
+  "dataset_sha256": "08705dff594b111da8dd120efb4a70ff7c42673053d4054f67ecef8c3b6d6834",
+  "selected_method": "pace_reversion",
+  "development_event_ids": [
+    "2024-01-R",
+    "2024-04-R",
+    "2024-07-R",
+    "2024-10-R",
+    "2024-13-R",
+    "2024-14-R",
+    "2024-15-R",
+    "2024-16-R"
+  ],
+  "test_event_ids": [
+    "2024-20-R",
+    "2024-24-R"
+  ],
+  "test_rows": 1839,
+  "test_file_sha256": "183671988f19c57a934aa2a9b397d612687600f33c3e6d331d5a2f16736af462",
+  "test_evaluation_performed_once_after_selection_freeze": true,
+  "selected_prediction_sources": {
+    "global_missing_history": 89,
+    "group": 1750
+  },
+  "baseline_prediction_sources": {
+    "compound_tyre_age_band": 1832,
+    "compound": 7
+  },
+  "outputs": {
+    "artifacts/predictions/final-test-predictions.csv": "c41cf557f9f4832c86796e8d1bd3054067f82863e1202ff9c54a80e22f575610",
+    "reports/final-test-metrics.json": "29c10c0c059f21dd08064793d294adf7f800e11ad38f3cf201a93de54ec6b48d",
+    "reports/tables/final-test-by-event.csv": "e841eec5e679ff7d60da71ca8fc86ffd42e183c3d1cef97e1102bc32ce66b6f8",
+    "reports/tables/final-test-by-condition.csv": "a1e2fb7056ff42f6e7af8b4398edc7bebc265888e69ccc8a841266c164799c47",
+    "reports/model-report.md": "3a5266ba5d1e2caf5a523a8b3afe1b53fdf321afc200c1c3e03ddbee8c9bcfcd",
+    "reports/figures/05-final-predicted-vs-observed.png": "5ca0d7fa9140fd3ce36e613bb4240aa61f711f0d8888f7b1c03a6c28ec43a7c6",
+    "reports/figures/06-final-mae-by-compound.png": "423d7773e3c923821f18d10f3dc99432ed8b50af3083f5848d4e97aa73f792af",
+    "reports/figures/07-final-pace-change-by-tyre-age.png": "649f6c61b551a68a72d303ed6b84e3ea98525613a0e1a3a33ab3564b9ca709e9"
+  }
+}

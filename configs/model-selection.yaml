@@ -1,0 +1,44 @@
+# Training/validation-only candidate policy for US-07.
+schema_version: 1
+experiment_version: "1.0.0"
+source_dataset_manifest: data/manifests/analysis-dataset-manifest.json
+baseline_metrics: reports/baseline-validation-metrics.json
+baseline_per_event_metrics: reports/tables/baseline-validation-by-event.csv
+fit_split: train
+evaluation_split: validation
+target_column: next_lap_time_seconds
+random_seed: 20260913
+
+candidates:
+  - two_lap_mean
+  - pace_reversion
+  - pace_reversion_compound_tyre_age
+two_lap_current_weight: 0.5
+previous_delta_bin_edges:
+  - -120.0
+  - -2.0
+  - -1.0
+  - -0.5
+  - -0.2
+  - 0.0
+  - 0.2
+  - 0.5
+  - 1.0
+  - 2.0
+  - 120.0
+tyre_age_bin_edges:
+  - 0
+  - 5
+  - 10
+  - 15
+  - 20
+  - 30
+  - 40
+  - 60
+minimum_group_samples: 30
+
+outputs:
+  candidate_metrics: reports/candidate-validation-metrics.json
+  candidate_per_event_metrics: reports/tables/candidate-validation-by-event.csv
+  selection_manifest: reports/model-selection-manifest.json
+  final_model_config: configs/final-model.yaml
