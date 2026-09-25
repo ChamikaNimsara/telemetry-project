@@ -55,6 +55,34 @@ and less frequent larger errors.*
 *Figure 2. Held-out MAE by compound. Hard and medium performance is stable;
 the soft estimate is based on only 25 samples and should not be generalized.*
 
+## Race performance analysis
+
+The predictive project is complemented by a focused engineering case study:
+Lando Norris versus Oscar Piastri on their fastest accurate laps in 2024 Abu
+Dhabi qualifying. Norris recorded 1:22.595, **0.209 s** faster than Piastri's
+1:22.804.
+
+The workflow distance-aligns speed, throttle, brake, gear, RPM, and DRS; builds
+a signed cumulative lap-delta trace; and summarizes 16 configured corner
+windows plus 21 fixed 250 m mini-sectors. The strongest positive corner-window
+contribution for Norris is T6 (+0.293 s), associated with a 15 m later derived
+brake marker but a 2.6 km/h lower minimum speed. The strongest loss is T7
+(-0.137 s). Because those corners are only 60.6 m apart, their configured
+windows should be read together: the linked T6–T7 complex nets +0.156 s to
+Norris. These are telemetry associations for investigation—not claims about
+setup, causality, or persistent driver performance.
+
+![Norris versus Piastri qualifying lap delta](reports/figures/08-qualifying-lap-delta.png)
+
+*Figure 3. Cumulative comparison-minus-reference elapsed-time delta. Positive
+values mean Norris is ahead; annotations identify the largest corner-window gain
+and loss with their measured supporting differences.*
+
+Read the full [race performance analysis](reports/race-performance-analysis.md)
+or the one-page [engineer's brief](reports/engineering-brief.md). The
+[corner table](reports/tables/qualifying-corner-comparison.csv) exposes minimum
+speed, braking, throttle-pickup, and time-delta calculations for every corner.
+
 ## Method and evaluation design
 
 The pipeline acquires ten 2024 race sessions, retains dry and accurate slick-tyre
@@ -125,7 +153,10 @@ uv run python -m telemetry_project.cli select-model
 # 5. Verify and recreate the frozen final evaluation
 uv run python -m telemetry_project.cli evaluate-final
 
-# 6. Audit the public release candidate
+# 6. Recreate the focused qualifying telemetry comparison
+uv run python -m telemetry_project.cli analyze-performance
+
+# 7. Audit the public release candidate
 uv run python -m telemetry_project.cli release-audit
 ```
 
@@ -133,6 +164,11 @@ PowerShell users can run the same commands unchanged on one line. Use
 `build-dataset --offline` after a successful online build to prove the required
 source responses are cached. The first full acquisition may take several
 minutes depending on FastF1 availability and network speed.
+
+`analyze-performance` downloads the configured qualifying telemetry on its first
+run and then supports `--offline` reproduction from the local cache. Change the
+drivers or event only through `configs/race-performance.yaml`; corner distances
+must be reviewed for the selected circuit rather than silently reused.
 
 To check one smaller session before the full workflow:
 
@@ -175,6 +211,7 @@ and version consistency.
 | What development data showed | [Exploratory analysis](reports/exploratory-analysis.md) and figures 01–04 under `reports/figures/` |
 | Why pace reversion was selected | [Candidate metrics](reports/candidate-validation-metrics.json) and [selection manifest](reports/model-selection-manifest.json) |
 | How the final result compares | [Final metrics](reports/final-test-metrics.json), [per-event table](reports/tables/final-test-by-event.csv), and [model report](reports/model-report.md) |
+| Where qualifying lap time is gained or lost | [Race performance analysis](reports/race-performance-analysis.md), [engineer's brief](reports/engineering-brief.md), and [analysis manifest](reports/race-performance-manifest.json) |
 | Whether the repository is release-ready | [Release checklist](docs/release-checklist.md) and [machine-readable audit](reports/release-audit.json) |
 
 ## Repository layout
@@ -208,6 +245,9 @@ committed.
 - Public-source fields can be corrected, incomplete, delayed, or inconsistent.
   This project is analytical support only and is unsuitable for live or
   safety-critical decisions.
+- The qualifying comparison is a two-lap observational case study. Its derived
+  brake and throttle markers have 5 m grid resolution, and public data cannot
+  isolate setup, tyre temperature, wind, tow, or energy-deployment effects.
 
 See the [model report](reports/model-report.md) for detailed event and condition
 results and the [retrospective](reports/retrospective.md) for the prioritized

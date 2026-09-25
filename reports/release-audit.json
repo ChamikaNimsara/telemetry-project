@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-09-13T07:37:58.226189Z",
-  "candidate_files": 95,
-  "candidate_bytes": 1348933,
-  "largest_file": "reports/figures/05-final-predicted-vs-observed.png",
-  "largest_file_bytes": 186608,
+  "generated_at_utc": "2026-09-25T15:15:02.698020Z",
+  "candidate_files": 108,
+  "candidate_bytes": 1958611,
+  "largest_file": "reports/figures/09-qualifying-telemetry-comparison.png",
+  "largest_file_bytes": 363329,
   "passed": true,
   "checks": [
     {

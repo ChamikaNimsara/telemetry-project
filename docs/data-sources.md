@@ -1,7 +1,7 @@
 # Data Sources, Provenance, and Use Constraints
 
 **Applies to:** US-03 acquisition and all downstream datasets
-**Reviewed:** 13 September 2026
+**Reviewed:** 25 September 2026
 
 ## Source Overview
 
@@ -28,6 +28,22 @@ scope without downloading the much larger car-telemetry feed. The US-04
 `build-dataset` command additionally loads and caches weather so dry-running
 eligibility can be verified. Race-control messages and telemetry remain
 disabled until their fields and quality checks are explicitly justified.
+
+## Qualifying telemetry case study
+
+US-09 separately loads the 2024 Abu Dhabi qualifying session with
+`telemetry=True` for the configured Norris/Piastri lap comparison. It uses the
+FastF1 `Distance`, `Time`, `Speed`, `Throttle`, `Brake`, `nGear`, `RPM`, and
+`DRS` channels. Corner apex distances were obtained from FastF1 3.8.3 circuit
+metadata and copied into `configs/race-performance.yaml` so a remote metadata
+change cannot silently alter the published segmentation.
+
+Raw telemetry and FastF1 cache responses remain local and untracked. Public
+outputs contain only original figures, per-corner aggregates, fixed 250 m
+mini-sector aggregates, narrative interpretation, and a manifest of selected
+lap/configuration identifiers and hashes. Distance interpolation and derived
+brake/throttle transition markers are documented approximations rather than
+sensor-grade measurements.
 
 The raw FastF1 request cache is stored under `data/raw/fastf1-cache/` by default.
 It is excluded from Git and must not be redistributed through this repository.

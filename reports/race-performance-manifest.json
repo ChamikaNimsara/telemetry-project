@@ -1,0 +1,64 @@
+{
+  "analysis_version": "1.0.0",
+  "config_path": "configs/race-performance.yaml",
+  "config_sha256": "bb6bb6d080638aac6c0dca93a30e0a43026f6a70e8abd3d83746d452457e23f1",
+  "corner_source": "FastF1 circuit metadata copied into versioned config",
+  "distance_step_m": 5.0,
+  "fastf1_version": "3.8.3",
+  "generated_at_utc": "2026-09-25T15:15:00.072396+00:00",
+  "limitations": [
+    "observational two-lap comparison",
+    "sampled and interpolated public telemetry",
+    "no setup, tyre-temperature, steering, wind, or tow controls"
+  ],
+  "manifest_schema_version": 1,
+  "outputs": [
+    {
+      "path": "reports/figures/08-qualifying-lap-delta.png",
+      "sha256": "6f9a78aad9b05e71aa8e375687a8ff2f3d2ad342088e1f128d8008825f6d66be"
+    },
+    {
+      "path": "reports/figures/09-qualifying-telemetry-comparison.png",
+      "sha256": "18ed93f0a8632e503312e15d33722b050e29e5c4a1bdb175a61a9be5b27530a3"
+    },
+    {
+      "path": "reports/figures/10-corner-time-contribution.png",
+      "sha256": "351584829f5d494671e3bcfb07eb7557651260abcdb2982f5fa646d88e46b0c2"
+    },
+    {
+      "path": "reports/tables/qualifying-corner-comparison.csv",
+      "sha256": "95f519e678a2ef8ae362e433bed52454984918b2647b7ccb7ab64fd6a5e448e3"
+    },
+    {
+      "path": "reports/tables/qualifying-mini-sectors.csv",
+      "sha256": "e98131ce8a986213bba6a613b5e13e91de6d9837b0a60de2e6c01e1b406c3837"
+    },
+    {
+      "path": "reports/race-performance-analysis.md",
+      "sha256": "aa12dbefe4b9105319b777d0d50aa9333967461cc3def68d73de570b10f3ed4a"
+    },
+    {
+      "path": "reports/engineering-brief.md",
+      "sha256": "026e0c1d37344c453ff24b2422d2ce2e04db65356ea4cb7dc7007cf4696e0cd1"
+    }
+  ],
+  "selected_laps": {
+    "comparison": {
+      "compound": "SOFT",
+      "driver": "PIA",
+      "lap_number": 15,
+      "lap_time_seconds": 82.804
+    },
+    "reference": {
+      "compound": "SOFT",
+      "driver": "NOR",
+      "lap_number": 15,
+      "lap_time_seconds": 82.595
+    }
+  },
+  "session": {
+    "event": "Abu Dhabi",
+    "session": "Q",
+    "year": 2024
+  }
+}

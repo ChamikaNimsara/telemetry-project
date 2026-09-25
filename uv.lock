@@ -807,6 +807,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastf1" },
     { name = "matplotlib" },
+    { name = "numpy" },
     { name = "pandas" },
     { name = "pyyaml" },
 ]
@@ -823,6 +824,7 @@ dev = [
 requires-dist = [
     { name = "fastf1", specifier = "==3.8.3" },
     { name = "matplotlib", specifier = "==3.11.2" },
+    { name = "numpy", specifier = "==2.5.3" },
     { name = "pandas", specifier = "==2.3.3" },
     { name = "pyyaml", specifier = "==6.0.3" },
 ]

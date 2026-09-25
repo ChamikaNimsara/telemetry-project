@@ -8,6 +8,11 @@ import pytest
 
 from telemetry_project.analysis.config import AnalysisConfig, AnalysisConfigError
 from telemetry_project.analysis.exploratory import ExploratorySummary
+from telemetry_project.analysis.performance import PerformanceSummary
+from telemetry_project.analysis.performance_config import (
+    PerformanceConfig,
+    PerformanceConfigError,
+)
 from telemetry_project.cli import main
 from telemetry_project.data.dataset_config import DatasetConfig, DatasetConfigError
 from telemetry_project.data.dataset_pipeline import DatasetBuildSummary
@@ -196,6 +201,58 @@ def test_analyze_data_command_reports_configuration_error(
 
     assert main(["analyze-data"]) == 2
     assert "unsafe split" in capsys.readouterr().err
+
+
+def test_analyze_performance_command_prints_summary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = Mock(spec=PerformanceConfig)
+    summary = PerformanceSummary(
+        "Abu Dhabi",
+        "Q",
+        "NOR",
+        "PIA",
+        82.595,
+        82.804,
+        0.209,
+        16,
+        22,
+        3,
+    )
+    analyze = Mock(return_value=summary)
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_performance_config", Mock(return_value=config)
+    )
+    monkeypatch.setattr("telemetry_project.cli.run_race_performance_analysis", analyze)
+
+    assert (
+        main(
+            [
+                "analyze-performance",
+                "--config",
+                "performance.yaml",
+                "--cache-dir",
+                "cache",
+                "--offline",
+            ]
+        )
+        == 0
+    )
+    output = json.loads(capsys.readouterr().out)
+    assert output["reference_advantage_seconds"] == 0.209
+    assert analyze.call_args.kwargs["offline"] is True
+
+
+def test_analyze_performance_command_reports_configuration_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "telemetry_project.cli.load_performance_config",
+        Mock(side_effect=PerformanceConfigError("bad comparison")),
+    )
+
+    assert main(["analyze-performance"]) == 2
+    assert "bad comparison" in capsys.readouterr().err
 
 
 def test_evaluate_baselines_command_prints_summary(

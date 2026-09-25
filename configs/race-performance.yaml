@@ -1,0 +1,53 @@
+# Reproducible same-car qualifying comparison for the engineering-analysis layer.
+schema_version: 1
+analysis_version: "1.0.0"
+
+session:
+  year: 2024
+  event: Abu Dhabi
+  session: Q
+
+drivers:
+  reference: NOR
+  reference_name: Lando Norris
+  comparison: PIA
+  comparison_name: Oscar Piastri
+
+sampling:
+  distance_step_m: 5
+  mini_sector_length_m: 250
+  corner_window_before_m: 200
+  corner_window_after_m: 200
+  brake_lookback_m: 300
+  throttle_lookahead_m: 300
+  throttle_pickup_percent: 90
+  sustained_samples: 3
+
+# Apex distances are copied from FastF1 3.8.3 circuit metadata for this event.
+# Keeping them in versioned configuration prevents an external metadata change
+# from silently changing the segmentation.
+corners:
+  - {label: T1, distance_m: 377.9}
+  - {label: T2, distance_m: 626.7}
+  - {label: T3, distance_m: 834.5}
+  - {label: T4, distance_m: 1009.6}
+  - {label: T5, distance_m: 1416.3}
+  - {label: T6, distance_m: 2616.8}
+  - {label: T7, distance_m: 2677.4}
+  - {label: T8, distance_m: 2877.3}
+  - {label: T9, distance_m: 3682.0}
+  - {label: T10, distance_m: 4026.2}
+  - {label: T11, distance_m: 4187.1}
+  - {label: T12, distance_m: 4305.0}
+  - {label: T13, distance_m: 4411.5}
+  - {label: T14, distance_m: 4534.7}
+  - {label: T15, distance_m: 4804.9}
+  - {label: T16, distance_m: 5043.7}
+
+outputs:
+  report: reports/race-performance-analysis.md
+  engineering_brief: reports/engineering-brief.md
+  figure_directory: reports/figures
+  corner_table: reports/tables/qualifying-corner-comparison.csv
+  mini_sector_table: reports/tables/qualifying-mini-sectors.csv
+  manifest: reports/race-performance-manifest.json

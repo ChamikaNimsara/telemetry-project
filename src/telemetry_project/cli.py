@@ -15,6 +15,14 @@ from telemetry_project.analysis.exploratory import (
     ExploratoryAnalysisError,
     run_exploratory_analysis,
 )
+from telemetry_project.analysis.performance import (
+    PerformanceAnalysisError,
+    run_race_performance_analysis,
+)
+from telemetry_project.analysis.performance_config import (
+    PerformanceConfigError,
+    load_performance_config,
+)
 from telemetry_project.config import resolve_cache_dir
 from telemetry_project.data.acquisition import (
     AcquisitionValidationError,
@@ -91,6 +99,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     analysis_parser.add_argument(
         "--config", type=Path, default=Path("configs/analysis.yaml")
+    )
+    performance_parser = commands.add_parser(
+        "analyze-performance",
+        help="Compare two configured laps using distance-aligned telemetry.",
+    )
+    performance_parser.add_argument(
+        "--config", type=Path, default=Path("configs/race-performance.yaml")
+    )
+    performance_parser.add_argument("--cache-dir", type=Path)
+    performance_parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Require the configured session telemetry to exist in the cache.",
     )
     baseline_parser = commands.add_parser(
         "evaluate-baselines",
@@ -212,6 +233,20 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Exploratory analysis error: {error}", file=sys.stderr)
             return 2
         print(json.dumps(asdict(analysis_summary), indent=2))
+        return 0
+
+    if args.command == "analyze-performance":
+        try:
+            performance_config = load_performance_config(args.config)
+            performance_summary = run_race_performance_analysis(
+                performance_config,
+                cache_dir=resolve_cache_dir(args.cache_dir),
+                offline=args.offline,
+            )
+        except (PerformanceConfigError, PerformanceAnalysisError, OSError) as error:
+            print(f"Race-performance analysis error: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(asdict(performance_summary), indent=2))
         return 0
 
     if args.command == "evaluate-baselines":
